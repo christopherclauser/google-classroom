@@ -3,8 +3,8 @@ import { Gamepad2, Search, Volume2, Film, Shield, Github } from 'lucide-react';
 import { cn } from '../lib/utils';
 
 interface HeaderProps {
-  currentView: 'home' | 'calc';
-  onViewChange: (view: 'home' | 'calc') => void;
+  currentView: 'home' | 'calc' | 'contact' | 'dashboard';
+  onViewChange: (view: 'home' | 'calc' | 'contact' | 'dashboard') => void;
 }
 
 export default function Header({ currentView, onViewChange }: HeaderProps) {
@@ -39,20 +39,19 @@ export default function Header({ currentView, onViewChange }: HeaderProps) {
           <button className="px-4 py-1.5 rounded-lg flex items-center gap-2 text-sm font-bold text-white/60 hover:text-white transition-all">
             <Film className="w-4 h-4" /> MOVIES
           </button>
+          <button 
+            onClick={() => onViewChange('calc')}
+            className={cn(
+              "px-4 py-1.5 rounded-lg flex items-center gap-2 text-sm font-bold transition-all",
+              currentView === 'calc' ? "bg-cyan-500 text-black shadow-[0_0_10px_rgba(6,182,212,0.3)]" : "text-white/60 hover:text-white"
+            )}
+          >
+            CALCULATOR
+          </button>
         </nav>
       </div>
 
       <div className="flex items-center gap-6">
-        <button 
-          onClick={() => onViewChange('calc')}
-          className={cn(
-            "px-4 py-1.5 rounded-lg flex items-center gap-2 text-sm font-bold transition-all",
-            currentView === 'calc' ? "bg-cyan-500 text-black shadow-[0_0_10px_rgba(6,182,212,0.3)]" : "text-white/60 hover:text-white"
-          )}
-        >
-          CALCULATOR
-        </button>
-
         <div className="relative hidden lg:block">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-white/30" />
           <input 
