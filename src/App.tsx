@@ -11,6 +11,8 @@ import UserSetup from './components/UserSetup';
 import Footer from './components/Footer';
 import { GAMES } from './constants';
 import { AnimatePresence, motion } from 'motion/react';
+import { io } from 'socket.io-client';
+import { Radio } from 'lucide-react';
 import { cn } from './lib/utils';
 
 type ViewType = 'home' | 'calc' | 'contact' | 'dashboard' | 'favorites' | 'chat';
@@ -25,6 +27,7 @@ export default function App() {
   const [view, setView] = useState<ViewType>('home');
   const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
   const [isLoaded, setIsLoaded] = useState(false);
+  const [announcement, setAnnouncement] = useState<{ fromName: string, text: string } | null>(null);
 
   // Handle hash-based routing
   useEffect(() => {
@@ -45,7 +48,17 @@ export default function App() {
     if (profile) setUserProfile(JSON.parse(profile));
     setIsLoaded(true);
 
-    return () => window.removeEventListener('hashchange', handleHashChange);
+    // Socket for announcements
+    const socket = io();
+    socket.on('global_announcement', (data) => {
+      setAnnouncement(data);
+      setTimeout(() => setAnnouncement(null), 10000); // Hide after 10s
+    });
+
+    return () => {
+      window.removeEventListener('hashchange', handleHashChange);
+      socket.close();
+    };
   }, []);
 
   const handleUpdateView = (newView: ViewType) => {
@@ -75,6 +88,38 @@ export default function App() {
 
       {/* Onboarding Overlay */}
       {!userProfile && <UserSetup onComplete={handleSetupComplete} />}
+
+      {/* Global Announcement UI */}
+      <AnimatePresence>
+        {announcement && (
+          <motion.div 
+            initial={{ y: -100, opacity: 0 }}
+            animate={{ y: 20, opacity: 1 }}
+            exit={{ y: -100, opacity: 0 }}
+            className="fixed top-20 left-1/2 -translate-x-1/2 z-[100] w-full max-w-lg px-4"
+          >
+            <div className="bg-red-500/20 backdrop-blur-xl border border-red-500/30 rounded-2xl p-4 flex items-center gap-4 shadow-[0_0_50px_rgba(239,68,68,0.2)]">
+              <div className="p-3 bg-red-500 rounded-xl shadow-[0_0_15px_rgba(239,68,68,0.5)]">
+                <Radio className="w-5 h-5 text-black animate-pulse" />
+              </div>
+              <div className="flex-1">
+                <div className="text-[10px] font-mono text-white/40 uppercase tracking-[0.2em] mb-1">
+                  System Broadcast // {announcement.fromName}
+                </div>
+                <div className="text-sm font-black text-white italic uppercase tracking-tight">
+                  {announcement.text}
+                </div>
+              </div>
+              <button 
+                onClick={() => setAnnouncement(null)}
+                className="text-white/20 hover:text-white"
+              >
+                CLOSE
+              </button>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       <Header currentView={view} onViewChange={handleUpdateView} />
       

@@ -102,6 +102,10 @@ async function startServer() {
       }
     });
 
+    socket.on("broadcast_message", ({ fromName, text }) => {
+      io.emit("global_announcement", { fromName, text, timestamp: new Date().toISOString() });
+    });
+
     socket.on("disconnect", () => {
       // Find and "log off" user if needed
       for (const [code, data] of users.entries()) {

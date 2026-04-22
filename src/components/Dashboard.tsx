@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { ShieldCheck, User, Mail, School, Home, MessageSquare, Trash2, Clock, Monitor, X, Activity } from 'lucide-react';
+import { ShieldCheck, User, Mail, School, Home, MessageSquare, Trash2, Clock, Monitor, X, Activity, Radio, Send } from 'lucide-react';
 import { GAMES } from '../constants';
+import { io, Socket } from 'socket.io-client';
 
 interface Response {
   id: number;
@@ -26,11 +27,23 @@ interface ActivePlayer {
 export default function Dashboard() {
   const [responses, setResponses] = useState<Response[]>([]);
   const [selectedPlayer, setSelectedPlayer] = useState<ActivePlayer | null>(null);
+  const [broadcastText, setBroadcastText] = useState('');
+  const [socket, setSocket] = useState<Socket | null>(null);
 
   useEffect(() => {
     const data = JSON.parse(localStorage.getItem('contact_responses') || '[]');
     setResponses(data);
+
+    const newSocket = io();
+    setSocket(newSocket);
+    return () => { newSocket.close(); };
   }, []);
+
+  const sendBroadcast = () => {
+    if (!broadcastText || !socket) return;
+    socket.emit('broadcast_message', { fromName: 'SYSTEM_OWNER', text: broadcastText });
+    setBroadcastText('');
+  };
 
   const handleDelete = (id: number) => {
     const updated = responses.filter(r => r.id !== id);
@@ -263,6 +276,27 @@ export default function Dashboard() {
 
         {/* Sidebar stats */}
         <div className="space-y-6">
+          {/* Broadcast Terminal */}
+          <div className="p-6 bg-red-500/5 border border-red-500/20 rounded-2xl">
+            <h4 className="text-[10px] font-mono text-red-500 uppercase tracking-widest mb-4 flex items-center gap-2">
+              <Radio className="w-3 h-3 animate-pulse" /> Grid Broadcast
+            </h4>
+            <div className="space-y-4">
+              <textarea 
+                value={broadcastText}
+                onChange={(e) => setBroadcastText(e.target.value)}
+                placeholder="GLOBAL MESSAGE..."
+                className="w-full bg-black/40 border border-white/5 rounded-xl p-3 text-[10px] font-mono text-white placeholder:text-white/10 focus:outline-none focus:border-red-500/30 h-24 resize-none"
+              />
+              <button 
+                onClick={sendBroadcast}
+                className="w-full py-2 bg-red-500/20 border border-red-500/30 text-red-500 text-[10px] font-black uppercase tracking-widest rounded-lg hover:bg-red-500 hover:text-black transition-all flex items-center justify-center gap-2"
+              >
+                <Send className="w-3 h-3" /> Execute Broadcast
+              </button>
+            </div>
+          </div>
+
           <div className="p-6 bg-cyan-500/5 border border-cyan-500/10 rounded-2xl">
             <h4 className="text-[10px] font-mono text-cyan-400 uppercase tracking-widest mb-4">Grid Statistics</h4>
             <div className="space-y-4">
