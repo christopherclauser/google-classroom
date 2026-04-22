@@ -19,12 +19,12 @@ export default function UserSetup({ onComplete }: UserSetupProps) {
   const [name, setName] = useState('');
   const [selectedBg, setSelectedBg] = useState(BACKGROUND_PRESETS[0].id);
   const [customBg, setCustomBg] = useState('');
-  const [isCunstom, setIsCustom] = useState(false);
+  const [isCustom, setIsCustom] = useState(false);
 
   const handleFinish = () => {
     if (!name.trim()) return;
-    const bgClass = isCunstom ? '' : (BACKGROUND_PRESETS.find(b => b.id === selectedBg)?.class || '');
-    onComplete({ name, background: bgClass, customBg: isCunstom ? customBg : undefined });
+    const bgClass = isCustom ? '' : (BACKGROUND_PRESETS.find(b => b.id === selectedBg)?.class || '');
+    onComplete({ name, background: bgClass, customBg: isCustom ? customBg : undefined });
   };
 
   return (
@@ -73,14 +73,14 @@ export default function UserSetup({ onComplete }: UserSetupProps) {
                   onClick={() => { setSelectedBg(bg.id); setIsCustom(false); }}
                   className={cn(
                     "relative h-24 rounded-xl overflow-hidden border-2 transition-all p-3 flex items-end justify-start text-left",
-                    selectedBg === bg.id && !isCunstom ? "border-cyan-500 shadow-[0_0_15px_rgba(6,182,212,0.3)]" : "border-white/10 hover:border-white/30",
+                    selectedBg === bg.id && !isCustom ? "border-cyan-500 shadow-[0_0_15px_rgba(6,182,212,0.3)]" : "border-white/10 hover:border-white/30",
                     bg.class
                   )}
                 >
                   <span className="text-[10px] font-bold text-white uppercase tracking-tighter bg-black/40 px-2 py-0.5 rounded backdrop-blur-sm">
                     {bg.name}
                   </span>
-                  {selectedBg === bg.id && !isCunstom && (
+                  {selectedBg === bg.id && !isCustom && (
                     <div className="absolute top-2 right-2 p-1 bg-cyan-500 rounded-full">
                       <Check className="w-3 h-3 text-black" />
                     </div>
@@ -93,7 +93,7 @@ export default function UserSetup({ onComplete }: UserSetupProps) {
                 onClick={() => setIsCustom(true)}
                 className={cn(
                   "relative h-24 rounded-xl overflow-hidden border-2 transition-all p-3 flex flex-col items-center justify-center gap-1",
-                    isCunstom ? "border-cyan-500 shadow-[0_0_15px_rgba(6,182,212,0.3)] bg-cyan-500/10" : "border-white/10 hover:border-white/30 bg-white/5"
+                    isCustom ? "border-cyan-500 shadow-[0_0_15px_rgba(6,182,212,0.3)] bg-cyan-500/10" : "border-white/10 hover:border-white/30 bg-white/5"
                 )}
               >
                 <ImageIcon className="w-6 h-6 text-white/50" />
@@ -101,7 +101,7 @@ export default function UserSetup({ onComplete }: UserSetupProps) {
               </button>
             </div>
 
-            {isCunstom && (
+            {isCustom && (
               <motion.div 
                 initial={{ opacity: 0, y: -10 }}
                 animate={{ opacity: 1, y: 0 }}

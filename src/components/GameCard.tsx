@@ -4,7 +4,7 @@ import { Heart } from 'lucide-react';
 import { Game } from '../constants';
 import { cn } from '../lib/utils';
 
-export default function GameCard({ game }: { game: Game }) {
+export default function GameCard({ game, ...props }: { game: Game, [key: string]: any }) {
   const [isFavorite, setIsFavorite] = useState(false);
 
   useEffect(() => {
