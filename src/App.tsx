@@ -28,6 +28,7 @@ export default function App() {
   const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
   const [isLoaded, setIsLoaded] = useState(false);
   const [announcement, setAnnouncement] = useState<{ fromName: string, text: string } | null>(null);
+  const [apiGames, setApiGames] = useState<any[]>([]);
 
   // Handle hash-based routing
   useEffect(() => {
@@ -46,7 +47,18 @@ export default function App() {
     // Initial profile load
     const profile = localStorage.getItem('user_profile');
     if (profile) setUserProfile(JSON.parse(profile));
-    setIsLoaded(true);
+    
+    // Fetch games from API as suggested by the troubleshooting guide
+    fetch('/api/games')
+      .then(res => res.json())
+      .then(data => {
+        setApiGames(data);
+        setIsLoaded(true);
+      })
+      .catch(() => {
+        setApiGames(GAMES); // Fallback
+        setIsLoaded(true);
+      });
 
     // Socket for announcements
     const socket = io();
@@ -146,7 +158,7 @@ export default function App() {
 
               <section className="pb-24 px-6 md:px-12" id="games-grid">
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-                  {GAMES.map(game => (
+                  {(apiGames.length > 0 ? apiGames : GAMES).map(game => (
                     <GameCard key={game.id} game={game} />
                   ))}
                 </div>

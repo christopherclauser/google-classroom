@@ -118,6 +118,18 @@ async function startServer() {
   });
 
   // API Route for clearing (owner mode)
+  app.get("/api/games", (req, res) => {
+    // Import GAMES dynamically or just define it here to avoid complex imports in server.ts if needed
+    // Actually, I'll just put the route above clear-chat
+    res.json([
+      { id: "2048", title: "2048", url: "https://play2048.co/" },
+      { id: "hextris", title: "HEXTRIS", url: "https://hextris.io/" },
+      { id: "slope", title: "SLOPE", url: "https://slope-game.github.io/" },
+      { id: "tetris", title: "TETRIS", url: "https://tetris.com/play-tetris" },
+      { id: "chrome-dino", title: "DINO RUN", url: "https://dino-run.com/" }
+    ]);
+  });
+
   app.get("/api/clear-chat", (req, res) => {
     friendRequests.length = 0;
     friendships.length = 0;
