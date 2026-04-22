@@ -3,7 +3,7 @@ import { Gamepad2 } from 'lucide-react';
 import { cn } from '../lib/utils';
 
 interface FooterProps {
-  onViewChange: (view: 'home' | 'calc' | 'contact' | 'dashboard') => void;
+  onViewChange: (view: 'home' | 'calc' | 'contact' | 'dashboard' | 'favorites' | 'chat') => void;
 }
 
 export default function Footer({ onViewChange }: FooterProps) {

@@ -1,13 +1,31 @@
 import React from 'react';
-import { Gamepad2, Search, Volume2, Film, Shield, Github } from 'lucide-react';
+import { Gamepad2, Search, Volume2, Film, Shield, Github, MessageSquare } from 'lucide-react';
 import { cn } from '../lib/utils';
 
 interface HeaderProps {
-  currentView: 'home' | 'calc' | 'contact' | 'dashboard';
-  onViewChange: (view: 'home' | 'calc' | 'contact' | 'dashboard') => void;
+  currentView: 'home' | 'calc' | 'contact' | 'dashboard' | 'favorites' | 'chat';
+  onViewChange: (view: 'home' | 'calc' | 'contact' | 'dashboard' | 'favorites' | 'chat') => void;
 }
 
 export default function Header({ currentView, onViewChange }: HeaderProps) {
+  const openInAboutBlank = () => {
+    const win = window.open();
+    if (!win) return;
+    
+    win.document.body.style.margin = '0';
+    win.document.body.style.height = '100vh';
+    win.document.body.style.overflow = 'hidden';
+    
+    const iframe = win.document.createElement('iframe');
+    iframe.style.border = 'none';
+    iframe.style.width = '100%';
+    iframe.style.height = '100%';
+    iframe.style.margin = '0';
+    iframe.src = window.location.href;
+    
+    win.document.body.appendChild(iframe);
+  };
+
   return (
     <header className="fixed top-0 left-0 right-0 z-50 bg-[#0c0c10]/80 backdrop-blur-md border-b border-white/5 py-4 px-6 md:px-12 flex items-center justify-between">
       <div className="flex items-center gap-8">
@@ -40,6 +58,24 @@ export default function Header({ currentView, onViewChange }: HeaderProps) {
             <Film className="w-4 h-4" /> MOVIES
           </button>
           <button 
+            onClick={() => onViewChange('chat')}
+            className={cn(
+              "px-4 py-1.5 rounded-lg flex items-center gap-2 text-sm font-bold transition-all",
+              currentView === 'chat' ? "bg-cyan-500 text-black shadow-[0_0_10px_rgba(6,182,212,0.3)]" : "text-white/60 hover:text-white"
+            )}
+          >
+            <MessageSquare className="w-4 h-4" /> CHAT
+          </button>
+          <button 
+            onClick={() => onViewChange('favorites')}
+            className={cn(
+              "px-4 py-1.5 rounded-lg flex items-center gap-2 text-sm font-bold transition-all",
+              currentView === 'favorites' ? "bg-red-500 text-white shadow-[0_0_10px_rgba(239,68,68,0.3)]" : "text-white/60 hover:text-white"
+            )}
+          >
+            FAVORITES
+          </button>
+          <button 
             onClick={() => onViewChange('calc')}
             className={cn(
               "px-4 py-1.5 rounded-lg flex items-center gap-2 text-sm font-bold transition-all",
@@ -62,7 +98,10 @@ export default function Header({ currentView, onViewChange }: HeaderProps) {
         </div>
         
         <div className="flex items-center gap-4 text-white/40">
-          <Shield className="w-5 h-5 hover:text-cyan-400 cursor-pointer transition-colors" />
+          <Shield 
+            className="w-5 h-5 hover:text-cyan-400 cursor-pointer transition-colors" 
+            onClick={openInAboutBlank}
+          />
           <Github className="w-5 h-5 hover:text-cyan-400 cursor-pointer transition-colors" />
         </div>
       </div>
