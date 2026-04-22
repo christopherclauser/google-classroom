@@ -61,7 +61,18 @@ export default function ChatView() {
     const profile = JSON.parse(localStorage.getItem('user_profile') || '{}');
     setMyName(profile.name || 'CITIZEN_' + code);
 
-    const newSocket = io();
+    // Initial groups load from localStorage for static mode
+    const savedGroups = JSON.parse(localStorage.getItem('grid_groups') || '[]');
+    setGroups(savedGroups);
+    const savedRequests = JSON.parse(localStorage.getItem('grid_requests') || '[]');
+    setRequests(savedRequests);
+    const savedFriends = JSON.parse(localStorage.getItem('grid_friends') || '[]');
+    setFriends(savedFriends);
+
+    const newSocket = io({
+      reconnectionAttempts: 3,
+      timeout: 5000,
+    });
     setSocket(newSocket);
 
     newSocket.on('connect', () => {
@@ -124,6 +135,18 @@ export default function ChatView() {
   const createGroup = () => {
     if (!newGroupName || !socket) return;
     socket.emit('create_group', { creatorCode: myCode, name: newGroupName, members: selectedFriends });
+    
+    // Static mode simulation: Add group locally too
+    const newGroup: GroupChat = {
+      id: uuidv4(),
+      name: newGroupName,
+      members: [myCode, ...selectedFriends],
+      messages: []
+    };
+    const updated = [...groups, newGroup];
+    setGroups(updated);
+    localStorage.setItem('grid_groups', JSON.stringify(updated));
+
     setNewGroupName('');
     setSelectedFriends([]);
     setIsCreatingGroup(false);
@@ -133,6 +156,15 @@ export default function ChatView() {
     e.preventDefault();
     if (!message || !activeGroup || !socket) return;
     socket.emit('send_message', { groupId: activeGroup.id, fromCode: myCode, fromName: myName, text: message });
+    
+    // Static mode simulation: Add message locally
+    const msg: Message = { from: myCode, name: myName, text: message, timestamp: new Date().toISOString() };
+    const updated = groups.map(g => 
+      g.id === activeGroup.id ? { ...g, messages: [...g.messages, msg] } : g
+    );
+    setGroups(updated);
+    localStorage.setItem('grid_groups', JSON.stringify(updated));
+
     setMessage('');
   };
 

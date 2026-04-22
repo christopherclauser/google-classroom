@@ -49,16 +49,25 @@ export default function App() {
     if (profile) setUserProfile(JSON.parse(profile));
     
     // Fetch games from API as suggested by the troubleshooting guide
-    fetch('/api/games')
-      .then(res => res.json())
-      .then(data => {
-        setApiGames(data);
-        setIsLoaded(true);
-      })
-      .catch(() => {
-        setApiGames(GAMES); // Fallback
-        setIsLoaded(true);
-      });
+    // Logic updated for GitHub compatibility: only try fetch if not on a file origin
+    if (window.location.protocol.startsWith('http')) {
+      fetch('./api/games') // Use relative path for GitHub subfolders
+        .then(res => {
+          if (!res.ok) throw new Error('Static Mode');
+          return res.json();
+        })
+        .then(data => {
+          setApiGames(data);
+          setIsLoaded(true);
+        })
+        .catch(() => {
+          setApiGames(GAMES); // Fallback to local constants
+          setIsLoaded(true);
+        });
+    } else {
+      setApiGames(GAMES);
+      setIsLoaded(true);
+    }
 
     // Socket for announcements
     const socket = io();
