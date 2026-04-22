@@ -1,0 +1,16 @@
+@import "tailwindcss";
+
+@theme {
+  --color-magenta-500: #ec4899;
+}
+
+@layer utilities {
+  .text-glow {
+    text-shadow: 0 0 15px currentColor;
+  }
+}
+
+body {
+  @apply bg-[#0c0c0e] text-white selection:bg-cyan-500 selection:text-black;
+  font-family: 'Inter', sans-serif;
+}
