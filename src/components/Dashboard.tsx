@@ -30,7 +30,6 @@ export default function Dashboard() {
   const [selectedPlayer, setSelectedPlayer] = useState<ActivePlayer | null>(null);
   const [broadcastText, setBroadcastText] = useState('');
   const [socket, setSocket] = useState<Socket | null>(null);
-  const [voidboltEnabled, setVoidboltEnabled] = useState(true);
 
   useEffect(() => {
     const data = JSON.parse(localStorage.getItem('contact_responses') || '[]');
@@ -45,17 +44,6 @@ export default function Dashboard() {
     if (!broadcastText || !socket) return;
     socket.emit('broadcast_message', { fromName: 'SYSTEM_OWNER', text: broadcastText });
     setBroadcastText('');
-  };
-
-  const toggleVoidbolt = () => {
-    const newState = !voidboltEnabled;
-    setVoidboltEnabled(newState);
-    if (socket) {
-      socket.emit('broadcast_message', { 
-        fromName: 'SYSTEM_OWNER', 
-        text: `Voidbolt Cooldown: ${newState ? 'ENABLED' : 'DISABLED'}` 
-      });
-    }
   };
 
   const handleDelete = (id: number) => {
@@ -320,29 +308,6 @@ export default function Dashboard() {
               <div className="flex justify-between items-center">
                 <span className="text-xs text-white/40 font-mono">Sector Status</span>
                 <span className="text-xs font-bold text-green-500 uppercase">Stable</span>
-              </div>
-            </div>
-            
-            <div className="mt-8 pt-6 border-t border-white/5 space-y-4">
-              <h4 className="text-[10px] font-mono text-cyan-400 uppercase tracking-widest">Voidbolt Configuration</h4>
-              <div className="space-y-2">
-                <div className="p-3 bg-black/40 rounded-xl border border-white/5 font-mono text-[9px] text-white/60 space-y-1">
-                  <div>// 1 minute cooldown if you hit a player</div>
-                  <div>// 35 seconds if you dont</div>
-                  <div>// does 6 damage with any armor</div>
-                  <div>// also if you do /void:linking you get no cooldown</div>
-                </div>
-                <button 
-                  onClick={toggleVoidbolt}
-                  className={cn(
-                    "w-full py-2 px-4 rounded-lg text-[10px] font-black uppercase tracking-widest transition-all",
-                    voidboltEnabled 
-                      ? "bg-green-500/20 text-green-500 border border-green-500/30" 
-                      : "bg-red-500/20 text-red-500 border border-red-500/30"
-                  )}
-                >
-                  Voidbolt {voidboltEnabled ? 'ENABLED' : 'DISABLED'}
-                </button>
               </div>
             </div>
           </div>
